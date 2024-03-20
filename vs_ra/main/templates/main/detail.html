@@ -1,0 +1,232 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block style %}
+<link rel="stylesheet" href="{% static 'css/style_StateHistory.css' %}" media="all">
+{% endblock %}
+
+{% block title %}
+{{ title }}
+{% endblock %}
+
+{% block nav_search %}
+<a class="nav__link" href="{% url 'search' %}"><h3>Поиск по судебным делам</h3></a>
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <div class="content--header_text">
+    <h4>Информация по делу № {{ data.StringNumber }}</h4>
+    </div>
+    <div class="content__inner content_details">
+        <div class="list_of_case">
+            {% if data.ObjectID %}
+                <div class="row_card">
+                    <div class="left">Уникальный идентификатор дела</div>
+                    <div class="right">{{ data.ObjectID }}</div>
+                </div>
+            {% endif %}
+            {% if data.StringNumber %}
+                <div class="row_card">
+                    <div class="left">Номер дела</div>
+                    <div class="right">{{ data.StringNumber }}</div>
+                </div>
+            {% endif %}
+
+
+            {% if data.Victim or data.Accused or data.Plaintiff or data.Defendant or data.AttractedPerson %}
+                <div class="row_card">
+                    <div class="left">Стороны</div>
+                    <div class="right">
+                {% with 'DecisionUS CaseListUS DecisionUA DecisionUNK DecisionUN' as list %}
+                    {% if data.type_of_legal_proceeding in list.split %}
+                        {% if data.Accused %}
+                            <b>Обвиняемый: </b>{{ data.Accused }}
+                        {% else %}
+                            {% if data.Defendant %}
+                                <b>Обвиняемый: </b>{{ data.Defendant }}
+                            {% endif %}
+                        {% endif %}
+                    {% endif %}
+                {% endwith %}
+                {% with 'DecisionAS CaseListAS DecisionDA DecisionAN' as list %}
+                    {% if data.type_of_legal_proceeding in list.split %}
+                        {% if data.Accused %}
+                            <b>Привлекаемое лицо: </b>{{ data.Accused }}
+                        {% else %}
+                            {% if data.AttractedPerson %}
+                                <b>Привлекаемое лицо: </b>{{ data.AttractedPerson }}
+                            {% else %}
+                                {% if data.Defendant %}
+                                    <b>Привлекаемое лицо: </b>{{ data.Defendant }}
+                                {% endif %}
+                            {% endif %}
+                        {% endif %}
+                    {% endif %}
+                {% endwith %}
+                {% with 'DecisionAS CaseListAS DecisionDA DecisionAN DecisionUS CaseListUS DecisionUA DecisionUNK DecisionUN' as list %}
+                    {% if data.type_of_legal_proceeding not in list.split %}
+                        {% if data.Plaintiff or data.Defendant %}
+                            <b>Истец: </b>{{ data.Plaintiff }}<br><b>Ответчик: </b>{{ data.Defendant }}
+                        {% else %}
+                            {% if data.Victim or data.Accused %}
+                                <b>Истец: </b>{{ data.Victim }}<br><b>Ответчик: </b>{{ data.Accused }}
+                            {% endif %}
+                        {% endif %}
+                    {% endif %}
+                {% endwith %}
+                </div>
+                </div>
+            {% endif %}
+
+
+            {% if data.Date %}
+                <div class="row_card">
+                    <div class="left">Дата регистрации</div>
+                    <div class="right">{{ data.Date }}</div>
+                </div>
+            {% endif %}
+            {% if data.Judge %}
+            <div class="row_card">
+                {% if key_judges %}
+                    <div class="left">Судебный состав</div>
+                {% else %}
+                    <div class="left">Судья</div>
+                {% endif %}
+                <div class="right">{{ data.Judge }}</div>
+            </div>
+            {% endif %}
+            {% if data.PresidingJudge %}
+            <div class="row_card">
+                <div class="left">Председательсвующий судья</div>
+                <div class="right">пред. {{ data.PresidingJudge }}</div>
+            </div>
+            {% endif %}
+            {% if data.JudgeSpeaker %}
+            <div class="row_card">
+                <div class="left">Судья докладчик</div>
+                <div class="right">{{ data.JudgeSpeaker }}</div>
+            </div>
+            {% endif %}
+            {% if data.ThirdJudge %}
+            <div class="row_card">
+                <div class="left">Третий судья</div>
+                <div class="right">{{ data.ThirdJudge }}</div>
+            </div>
+            {% endif %}
+            {% if data.FourthJudge %}
+            <div class="row_card">
+                <div class="left">Четвертый судья</div>
+                <div class="right">{{ data.FourthJudge }}</div>
+            </div>
+            {% endif %}
+            {% if data.FifthJudge %}
+            <div class="row_card">
+                <div class="left">Пятый судья</div>
+                <div class="right">{{ data.FifthJudge }}</div>
+            </div>
+            {% endif %}
+
+            {% if data.Category %}
+                <div class="row_card">
+                    <div class="left">Категория дела</div>
+                    <div class="right">{{ data.Category }}</div>
+                </div>
+            {% endif %}
+            {% if data.ArticleCC or data.ArticleAC %}
+                <div class="row_card">
+
+                    {% with 'DecisionUS CaseListUS DecisionUA DecisionUNK DecisionUN' as list %}
+                        {% if data.type_of_legal_proceeding in list.split %}
+                            <div class="left">Статья УК РА</div>
+                        {% endif %}
+                    {% endwith %}
+                    {% with 'DecisionAS CaseListAS DecisionDA DecisionAN' as list %}
+                        {% if data.type_of_legal_proceeding in list.split %}
+                            <div class="left">Статья КоАП РА</div>
+                        {% endif %}
+                    {% endwith %}
+                    {% with 'DecisionUS CaseListUS DecisionUA DecisionUNK DecisionUN DecisionAS CaseListAS DecisionDA DecisionAN' as list %}
+                        {% if data.type_of_legal_proceeding not in list.split %}
+                            <div class="left">Статья</div>
+                        {% endif %}
+                    {% endwith %}
+                    {% if data.ArticleCC %}
+                        <div class="right">{{ data.ArticleCC }}</div>
+                    {% else %}
+                        {% if data.ArticleAC %}
+                            <div class="right">{{ data.ArticleAC }}</div>
+                        {% else %}
+                            <div class="right"></div>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            {% endif %}
+
+<!--            {% if data.Document %}-->
+<!--            <div class="row_card">-->
+<!--                <div class="left">Судебный акт</div>-->
+<!--                <div class="right">{{ data.Document }}</div>-->
+<!--            </div>-->
+<!--            {% endif %}-->
+            {% if data.StateName %}
+            <div class="row_card">
+                <div class="left">Текущее состояние</div>
+                <div class="right">{{ data.StateName }}</div>
+            </div>
+            {% endif %}
+        </div>
+
+        {% if table_1 %}
+        <div class="StateHistory_HearingsCase">
+            <div class="StateHistory_HearingsCase__title">История дела</div>
+            <div class="StateHistory_HearingsCase__table">{{ table_1|safe }}</div>
+        </div>
+        {% endif %}
+
+        {% if table_2 %}
+        <div class="StateHistory_HearingsCase">
+            <div class="StateHistory_HearingsCase__title">Судебные заседания</div>
+            <div class="StateHistory_HearingsCase__table">{{ table_2|safe }}</div>
+        </div>
+        {% endif %}
+        {% if docx_base64 and name_on_site and name_doc and date_doc%}
+        <div class="StateHistory_HearingsCase">
+            <div class="StateHistory_HearingsCase__title">Судебные акты</div>
+            <div class="StateHistory_HearingsCase__table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Дата документа</th>
+                            <th>Вид документа</th>
+                            <th>Текст документа</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{ date_doc }}</td>
+                            <td>{{ name_on_site }}</td>
+                            <td>
+                                <a download="{{ name_doc }}" href="data:application/vnd.openxmlformats-officedocument.wordprocessingml.document;base64,{{ docx_base64 }}">Скачать файл</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {% endif %}
+
+        <div class="btn_div go_back">
+        <input type="submit" class="btn" onclick="history.back() || $.searchForm.goBack('/mgs/services/cases/appeal-civil?courtInternalName=mgs'); return false;" value="Вернуться к списку"/>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/StateHistory.js' %}"></script>
+<script src="{% static 'js/HearingsCase.js' %}"></script>
+<script src="{% static 'js/table_docx.js' %}"></script>
+{% endblock %}
